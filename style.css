@@ -129,18 +129,18 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-/* ✅ Style the Weekday Row */
+/* ✅ Fix Weekday Row (Place before calendar styles) */
 .weekdays-row {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7 columns for weekdays */
+    grid-template-columns: repeat(7, 1fr);
     gap: 5px;
     text-align: center;
     font-weight: bold;
     padding-bottom: 5px;
-    border-bottom: 2px solid #ccc; /* Underline for separation */
+    margin-bottom: 10px; /* Adds spacing between labels and days */
 }
 
-/* ✅ Style Individual Weekday Labels */
+/* ✅ Fix Individual Weekday Styling */
 .weekday {
     padding: 10px;
     background: #f8f9fa;
@@ -148,18 +148,19 @@ body {
     color: #333;
     font-weight: bold;
     border-radius: 5px;
+    text-align: center;
+    border: 1px solid #ccc; /* Adds subtle border */
 }
 
-
-/* Fix: Ensure Main Content is Visible */
+/* ✅ Keep Container (DO NOT REMOVE) */
 .container {
-    margin-left: 220px; /* Push calendar next to sidebar */
+    margin-left: 220px; /* Keeps calendar positioned correctly */
     text-align: center;
-    width: calc(100% - 220px); /* Ensure it doesn't get squished */
+    width: calc(100% - 220px); /* Prevents squishing */
     padding: 20px;
 }
 
-/* Fix: Ensure Calendar Uses a Grid */
+/* ✅ Update Existing Calendar Styles */
 #calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr); /* 7 columns for weekdays */
@@ -172,7 +173,7 @@ body {
     margin: 20px auto;
 }
 
-/* Fix: Ensure Each Day is Visible */
+/* ✅ Keep Existing .day Styles */
 .day {
     padding: 20px;
     border: 1px solid #ccc;

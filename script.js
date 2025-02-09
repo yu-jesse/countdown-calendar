@@ -84,6 +84,7 @@ function loadCalendarState() {
     updateShiftCountdown();
 }
 
+
 function generateCalendar(month, year) {
     const calendarContainer = document.getElementById('calendar');
     const monthYearDisplay = document.getElementById('monthYear');
@@ -91,16 +92,16 @@ function generateCalendar(month, year) {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // Weekday names
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // Weekday labels
 
     // ✅ Reset calendar display
     calendarContainer.innerHTML = '';
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
 
-    // ✅ Create Weekday Headers
+    // ✅ Create Weekday Row
     const weekdaysRow = document.createElement('div');
     weekdaysRow.classList.add('weekdays-row');
-    
+
     weekdays.forEach(day => {
         const dayLabel = document.createElement('div');
         dayLabel.classList.add('weekday');
@@ -108,9 +109,9 @@ function generateCalendar(month, year) {
         weekdaysRow.appendChild(dayLabel);
     });
 
-    calendarContainer.appendChild(weekdaysRow);
+    calendarContainer.appendChild(weekdaysRow); // ✅ Add weekday row at the top
 
-    // ✅ Add Empty Divs for Alignment (First Row Offset)
+    // ✅ Generate Empty Spaces for Alignment
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement('div');
         emptyDiv.classList.add('empty');
@@ -128,7 +129,7 @@ function generateCalendar(month, year) {
             dayDiv.classList.add('highlight');
         }
 
-        // ✅ Add Checkboxes for Workdays
+        // ✅ Checkbox for Workdays
         const checkBoxElement = document.createElement('input');
         checkBoxElement.type = 'checkbox';
         checkBoxElement.classList.add('checkbox');
@@ -151,7 +152,6 @@ function generateCalendar(month, year) {
     // ✅ Load Saved Data
     loadCalendarState();
 }
-
 
 
 
