@@ -76,12 +76,17 @@ function nextMonth() {
 }
 
 function saveCalendarState() {
-    const workDays = [];
-    const checkedDays = [];
+    const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
+    const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
     document.querySelectorAll('#calendar .day.work').forEach(div => {
-        workDays.push({ day: div.innerText, month: currentMonth, year: currentYear });
+        const workDay = { day: div.innerText, month: currentMonth, year: currentYear };
+        if (!workDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
+            workDays.push(workDay);
+        }
         if (div.classList.contains('checked')) {
-            checkedDays.push({ day: div.innerText, month: currentMonth, year: currentYear });
+            if (!checkedDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
+                checkedDays.push(workDay);
+            }
         }
     });
     localStorage.setItem('workDays', JSON.stringify(workDays));
@@ -94,10 +99,10 @@ function loadCalendarState() {
     const dayDivs = document.querySelectorAll('#calendar .day');
     dayDivs.forEach(div => {
         const dayInfo = { day: div.innerText, month: currentMonth, year: currentYear };
-        if (workDays.some(day => day.day == dayInfo.day && day.month == dayInfo.month && day.year == dayInfo.year)) {
+        if (workDays.some(d => d.day == dayInfo.day && d.month == dayInfo.month && d.year == dayInfo.year)) {
             div.classList.add('work');
         }
-        if (checkedDays.some(day => day.day == dayInfo.day && day.month == dayInfo.month && day.year == dayInfo.year)) {
+        if (checkedDays.some(d => d.day == dayInfo.day && d.month == dayInfo.month && d.year == dayInfo.year)) {
             div.classList.add('checked');
             if (!div.querySelector('.checkbox')) {
                 const checkBoxElement = document.createElement('input');
@@ -119,8 +124,8 @@ function loadCalendarState() {
 }
 
 function updateShiftCountdown() {
-    const workDays = document.querySelectorAll('#calendar .work');
-    const checkedDays = document.querySelectorAll('#calendar .work.checked');
+    const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
+    const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
     const shiftsLeft = workDays.length - checkedDays.length;
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
