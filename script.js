@@ -99,7 +99,7 @@ function generateCalendar(month, year) {
     // 🛠 Add Empty Divs for Alignment (Push First Day to Correct Position)
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement('div');
-        emptyDiv.classList.add('empty'); // Optional: Add class for styling
+        emptyDiv.classList.add('empty');
         calendarContainer.appendChild(emptyDiv);
     }
 
@@ -107,7 +107,7 @@ function generateCalendar(month, year) {
     for (let day = 1; day <= daysInMonth; day++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
-        dayDiv.innerText = day;
+        dayDiv.innerText = day; // ✅ Fix: Now the number is visible
 
         // Highlight today's date
         if (month === today.getMonth() && year === today.getFullYear() && day === today.getDate()) {
