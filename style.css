@@ -1,4 +1,4 @@
-/* General Styles */
+/* Fix: Ensure Sidebar and Calendar Are Both Visible */
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -21,97 +21,21 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 1000; /* Ensure sidebar is on top */
+    z-index: 1000;
 }
 
-/* Sidebar Titles */
-.sidebar h2 {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-
-/* Sidebar Month Buttons Grid */
-#monthButtons {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    margin-bottom: 15px;
-}
-
-/* Sidebar Month Buttons */
-#monthButtons button {
-    background: #444;
-    color: white;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-#monthButtons button:hover {
-    background: #555;
-}
-
-/* Year Selector Dropdown */
-#yearSelector {
-    width: 100%;
-    padding: 5px;
-    margin-bottom: 10px;
-}
-
-/* Today Button */
-#todayButton {
-    background: #ff5722;
-    color: white;
-    border: none;
-    padding: 8px;
-    width: 100%;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-#todayButton:hover {
-    background: #e64a19;
-}
-
-/* Main Container (Push Calendar Next to Sidebar) */
+/* Fix: Ensure Main Content is Visible */
 .container {
-    margin-left: 220px; /* Push the calendar to the right of the sidebar */
+    margin-left: 220px; /* Push calendar next to sidebar */
     text-align: center;
-    max-width: calc(100% - 220px);
+    width: calc(100% - 220px); /* Ensure it doesn't get squished */
     padding: 20px;
 }
 
-/* Calendar Header */
-.header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.header button {
-    font-size: 1.5em;
-    padding: 5px 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.header button:hover {
-    transform: scale(1.1);
-}
-
-#monthYear {
-    font-size: 1.5em;
-    margin: 0 20px;
-}
-
-/* Calendar Grid */
+/* Fix: Ensure Calendar Uses a Grid */
 #calendar {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7 columns for week */
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for weekdays */
     gap: 5px;
     padding: 10px;
     background: #fff;
@@ -121,7 +45,7 @@ body {
     margin: 20px auto;
 }
 
-/* Calendar Days */
+/* Fix: Ensure Each Day is Visible */
 .day {
     padding: 20px;
     border: 1px solid #ccc;
@@ -130,33 +54,28 @@ body {
     transition: background-color 0.3s ease, transform 0.2s;
     cursor: pointer;
     text-align: center;
-    font-size: 16px; /* Ensure numbers are visible */
+    font-size: 16px;
     font-weight: bold;
-    background: white; /* Ensure visibility */
+    background: white;
 }
 
-/* Empty Slots for Alignment */
+/* Empty Space for Calendar Alignment */
 .empty {
     background: transparent;
     border: none;
 }
 
-/* Hover Effect on Days */
-.day:hover {
-    transform: scale(1.05);
-}
-
-/* Highlight Current Day */
+/* Highlight Today's Date */
 .day.highlight {
     background-color: yellow;
 }
 
-/* Workday Marking */
+/* Workday Selection */
 .day.work {
     background-color: #a9dfbf;
 }
 
-/* Hide Checkbox by Default */
+/* Hide Checkboxes by Default */
 .day .checkbox {
     position: absolute;
     top: 5px;

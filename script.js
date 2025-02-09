@@ -88,33 +88,33 @@ function generateCalendar(month, year) {
     const calendarContainer = document.getElementById('calendar');
     const monthYearDisplay = document.getElementById('monthYear');
     const today = new Date();
-    const firstDay = new Date(year, month, 1).getDay(); // First weekday of the month
-    const daysInMonth = new Date(year, month + 1, 0).getDate(); // Total days in the month
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    // Reset calendar display
+    // ✅ Reset calendar content
     calendarContainer.innerHTML = '';
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
 
-    // 🛠 Add Empty Divs for Alignment (Push First Day to Correct Position)
+    // ✅ Add Empty Divs for Alignment (First Row Offset)
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement('div');
         emptyDiv.classList.add('empty');
         calendarContainer.appendChild(emptyDiv);
     }
 
-    // 🛠 Generate Days in the Month
+    // ✅ Generate Calendar Days
     for (let day = 1; day <= daysInMonth; day++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
-        dayDiv.innerText = day; // ✅ Fix: Now the number is visible
+        dayDiv.innerText = day;
 
-        // Highlight today's date
+        // ✅ Highlight Today
         if (month === today.getMonth() && year === today.getFullYear() && day === today.getDate()) {
             dayDiv.classList.add('highlight');
         }
 
-        // Add hidden checkbox inside each day
+        // ✅ Add Checkboxes
         const checkBoxElement = document.createElement('input');
         checkBoxElement.type = 'checkbox';
         checkBoxElement.classList.add('checkbox');
@@ -126,6 +126,7 @@ function generateCalendar(month, year) {
         };
         dayDiv.appendChild(checkBoxElement);
 
+        // ✅ Workday Selection
         dayDiv.onclick = function () {
             toggleWorkday(dayDiv, day);
         };
@@ -133,9 +134,10 @@ function generateCalendar(month, year) {
         calendarContainer.appendChild(dayDiv);
     }
 
-    // 🛠 Load previously saved data (workdays, checked shifts)
+    // ✅ Load Saved Data
     loadCalendarState();
 }
+
 
 
 function toggleWorkday(dayDiv, day) {
