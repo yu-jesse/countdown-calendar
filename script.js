@@ -13,6 +13,28 @@ function initializeCalendar() {
     generateCalendar(window.currentMonth, window.currentYear);
 }
 
+function loadCalendarState() {
+    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
+    const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
+    const dayDivs = document.querySelectorAll('#calendar .day');
+
+    dayDivs.forEach(div => {
+        const day = div.innerText;
+        if (!day) return;
+
+        if (storedData.workDays.some(d => d.day == day)) {
+            div.classList.add('work');
+        }
+
+        if (storedData.checkedDays.some(d => d.day == day)) {
+            div.classList.add('checked');
+            div.querySelector('.checkbox').checked = true;
+        }
+    });
+
+    updateShiftCountdown();
+}
+
 function generateCalendar(month, year) {
     const calendarContainer = document.getElementById('calendar');
     const monthYearDisplay = document.getElementById('monthYear');
@@ -106,29 +128,6 @@ function saveCalendarState() {
 
     updateShiftCountdown();
 }
-
-function loadCalendarState() {
-    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
-    const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
-    const dayDivs = document.querySelectorAll('#calendar .day');
-
-    dayDivs.forEach(div => {
-        const day = div.innerText;
-        if (!day) return;
-
-        if (storedData.workDays.some(d => d.day == day)) {
-            div.classList.add('work');
-        }
-
-        if (storedData.checkedDays.some(d => d.day == day)) {
-            div.classList.add('checked');
-            div.querySelector('.checkbox').checked = true;
-        }
-    });
-
-    updateShiftCountdown();
-}
-
 
 function updateShiftCountdown() {
     let totalWorkDays = 0;
