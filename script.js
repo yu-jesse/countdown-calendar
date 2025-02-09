@@ -76,13 +76,13 @@ function nextMonth() {
 }
 
 function saveCalendarState() {
-    // Get saved workdays and checked days from localStorage
+    // Get current month and year
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+
+    // Load all workdays and checked days from localStorage
     let workDays = JSON.parse(localStorage.getItem('workDays')) || [];
     let checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
-
-    // Get current month and year
-    const currentMonth = new Date().getMonth(); // 0 to 11 (January to December)
-    const currentYear = new Date().getFullYear();
 
     // Loop through all day elements to save selected workdays
     document.querySelectorAll('#calendar .day').forEach(div => {
@@ -91,12 +91,12 @@ function saveCalendarState() {
 
         const workDay = { day, month: currentMonth, year: currentYear };
 
-        // Only add workday if it's not already in the list
+        // Add workday if it's not already in the list
         if (!workDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
             workDays.push(workDay);
         }
 
-        // Save the checked workdays (completed shifts)
+        // Save checked days (completed shifts)
         if (div.classList.contains('checked')) {
             if (!checkedDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
                 checkedDays.push(workDay);
@@ -104,7 +104,7 @@ function saveCalendarState() {
         }
     });
 
-    // Store workdays and checked days in localStorage
+    // Store updated workdays and checked days
     localStorage.setItem('workDays', JSON.stringify(workDays));
     localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
 
@@ -120,7 +120,7 @@ function loadCalendarState() {
     const dayDivs = document.querySelectorAll('#calendar .day');
 
     // Get current month and year
-    const currentMonth = new Date().getMonth(); // 0 to 11 (January to December)
+    const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
     // Loop through all the day divs to load workdays and checkboxes
@@ -158,7 +158,6 @@ function loadCalendarState() {
     // Update shift countdown when loading state
     updateShiftCountdown();
 }
-
 
 
 
