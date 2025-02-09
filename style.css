@@ -158,11 +158,26 @@ body {
     padding: 20px;
 }
 
+/* Responsive Sidebar for Smaller Screens */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 10px;
+    }
+
+    .container {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
 /* Calendar Grid */
 #calendar {
     display: grid !important;
-    grid-template-columns: repeat(7, 1fr) !important;
-    gap: 5px !important;
+    grid-template-columns: repeat(7, minmax(50px, 1fr)) !important;
+    gap: 3px !important; /* Reduced gap for better alignment */
     padding: 10px;
     background: #fff;
     border-radius: 10px;
@@ -183,6 +198,12 @@ body {
     font-size: 16px;
     font-weight: bold;
     background: white;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.day:hover {
+    background: #f1f1f1;
+    transform: scale(1.03);
 }
 
 /* Empty Calendar Cells */
@@ -201,19 +222,13 @@ body {
     background-color: #a9dfbf;
 }
 
-/* Checkbox */
-.day .checkbox {
+/* Always Visible Checkbox for Workdays */
+.day.work .checkbox {
     position: absolute;
     top: 5px;
     right: 5px;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-/* Show Checkbox When Hovering */
-.day.work:hover .checkbox,
-.day.work.checked .checkbox {
     opacity: 1;
+    transition: opacity 0.3s ease-in-out;
 }
 
 /* Cross Out Checked Days */
@@ -225,4 +240,6 @@ body {
 #shiftCountdown {
     margin-top: 20px;
     font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
 }
