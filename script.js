@@ -84,32 +84,37 @@ function loadCalendarState() {
     updateShiftCountdown();
 }
 
-// ✅ Now generateCalendar() can recognize loadCalendarState()
 function generateCalendar(month, year) {
     const calendarContainer = document.getElementById('calendar');
     const monthYearDisplay = document.getElementById('monthYear');
     const today = new Date();
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay(); // First weekday of the month
+    const daysInMonth = new Date(year, month + 1, 0).getDate(); // Total days in the month
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+    // Reset calendar display
     calendarContainer.innerHTML = '';
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
 
+    // 🛠 Add Empty Divs for Alignment (Push First Day to Correct Position)
     for (let i = 0; i < firstDay; i++) {
-        calendarContainer.appendChild(document.createElement('div')); // Empty spaces for alignment
+        const emptyDiv = document.createElement('div');
+        emptyDiv.classList.add('empty'); // Optional: Add class for styling
+        calendarContainer.appendChild(emptyDiv);
     }
 
+    // 🛠 Generate Days in the Month
     for (let day = 1; day <= daysInMonth; day++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
         dayDiv.innerText = day;
 
+        // Highlight today's date
         if (month === today.getMonth() && year === today.getFullYear() && day === today.getDate()) {
             dayDiv.classList.add('highlight');
         }
 
-        // Add hidden checkbox
+        // Add hidden checkbox inside each day
         const checkBoxElement = document.createElement('input');
         checkBoxElement.type = 'checkbox';
         checkBoxElement.classList.add('checkbox');
@@ -128,8 +133,10 @@ function generateCalendar(month, year) {
         calendarContainer.appendChild(dayDiv);
     }
 
-    loadCalendarState(); // ✅ No more error!
+    // 🛠 Load previously saved data (workdays, checked shifts)
+    loadCalendarState();
 }
+
 
 function toggleWorkday(dayDiv, day) {
     dayDiv.classList.toggle('work');
