@@ -1,4 +1,4 @@
-/* Fix: Ensure Sidebar and Calendar Are Both Visible */
+/* Global Styles */
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -8,7 +8,7 @@ body {
     overflow: auto;
 }
 
-/* Sidebar Styles */
+/* Sidebar */
 .sidebar {
     position: fixed;
     left: 0;
@@ -30,17 +30,16 @@ body {
     margin-bottom: 10px;
 }
 
-/* Restore Sidebar Month Buttons Layout */
+/* Month Buttons */
 #monthButtons {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-columns: repeat(3, 1fr);
     gap: 5px;
     margin-bottom: 15px;
     width: 100%;
     justify-content: center;
 }
 
-/* ✅ Restore Button Shape, Color, and Size */
 #monthButtons button {
     background: #444;
     color: white;
@@ -53,13 +52,12 @@ body {
     transition: background 0.3s, transform 0.2s;
 }
 
-/* ✅ Restore Hover Effect */
 #monthButtons button:hover {
     background: #555;
     transform: scale(1.05);
 }
 
-/* Restore Year Selector Dropdown */
+/* Year Selector */
 #yearSelector {
     width: 100%;
     padding: 8px;
@@ -68,7 +66,7 @@ body {
     font-weight: bold;
 }
 
-/* ✅ Fix Today Button */
+/* Today Button */
 #todayButton {
     background: #ff5722;
     color: white;
@@ -82,22 +80,20 @@ body {
     transition: background 0.3s, transform 0.2s;
 }
 
-/* ✅ Restore Hover Effect */
 #todayButton:hover {
     background: #e64a19;
     transform: scale(1.05);
 }
 
-/* ✅ Fix Month Changer Layout */
+/* Header (Month Changer) */
 .header {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px; /* Adds spacing between buttons and label */
+    gap: 15px;
     margin-bottom: 20px;
 }
 
-/* ✅ Fix Month Changer Button Positioning */
 .header button {
     font-size: 1.5em;
     padding: 10px 15px;
@@ -109,27 +105,26 @@ body {
     transition: background 0.3s, transform 0.2s;
 }
 
-/* ✅ Ensure Buttons Stay in Position */
 .header button:first-child {
-    margin-right: auto; /* Push left button to the left */
+    margin-right: auto;
 }
 
 .header button:last-child {
-    margin-left: auto; /* Push right button to the right */
+    margin-left: auto;
 }
 
-/* ✅ Fix Month-Year Label */
+/* Month-Year Label */
 #monthYear {
-    font-size: 1.8em; /* Make text larger */
+    font-size: 1.8em;
     font-weight: bold;
-    color: #222; /* Darker color for readability */
-    background: #f8f9fa; /* Light background */
+    color: #222;
+    background: #f8f9fa;
     padding: 10px 15px;
-    border-radius: 8px; /* Rounded edges */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* ✅ Fix Weekday Row (Place before calendar styles) */
+/* Weekday Row */
 .weekdays-row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -137,10 +132,10 @@ body {
     text-align: center;
     font-weight: bold;
     padding-bottom: 5px;
-    margin-bottom: 10px; /* Adds spacing between labels and days */
+    width: 100%;
 }
 
-/* ✅ Fix Individual Weekday Styling */
+/* Weekday Labels */
 .weekday {
     padding: 10px;
     background: #f8f9fa;
@@ -149,37 +144,40 @@ body {
     font-weight: bold;
     border-radius: 5px;
     text-align: center;
-    border: 1px solid #ccc; /* Adds subtle border */
+    border: 1px solid #ccc;
 }
 
-/* ✅ Keep Container (DO NOT REMOVE) */
+/* Main Container */
 .container {
-    margin-left: 220px; /* Keeps calendar positioned correctly */
-    text-align: center;
-    width: calc(100% - 220px); /* Prevents squishing */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: 220px;
+    width: calc(100% - 220px);
     padding: 20px;
 }
 
-/* ✅ Update Existing Calendar Styles */
+/* Calendar Grid */
 #calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7 columns for weekdays */
-    gap: 5px;
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 5px !important;
     padding: 10px;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 1000px;
     margin: 20px auto;
+    width: 100%;
 }
 
-/* ✅ Keep Existing .day Styles */
+/* Calendar Days */
 .day {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     position: relative;
-    transition: background-color 0.3s ease, transform 0.2s;
     cursor: pointer;
     text-align: center;
     font-size: 16px;
@@ -187,7 +185,7 @@ body {
     background: white;
 }
 
-/* Empty Space for Calendar Alignment */
+/* Empty Calendar Cells */
 .empty {
     background: transparent;
     border: none;
@@ -203,7 +201,7 @@ body {
     background-color: #a9dfbf;
 }
 
-/* Hide checkbox by default */
+/* Checkbox */
 .day .checkbox {
     position: absolute;
     top: 5px;
@@ -212,7 +210,7 @@ body {
     transition: opacity 0.3s ease-in-out;
 }
 
-/* ✅ Show checkbox ONLY when hovering over selected workdays */
+/* Show Checkbox When Hovering */
 .day.work:hover .checkbox,
 .day.work.checked .checkbox {
     opacity: 1;
@@ -223,7 +221,7 @@ body {
     text-decoration: line-through;
 }
 
-/* Shift Countdown Display */
+/* Shift Countdown */
 #shiftCountdown {
     margin-top: 20px;
     font-size: 1.2em;
