@@ -1,21 +1,20 @@
-let currentMonth, currentYear;
+// Ensure global variables are only declared once
+if (typeof window.currentMonth === 'undefined') {
+    window.currentMonth = new Date().getMonth();
+    window.currentYear = new Date().getFullYear();
+}
 
-// Fetch last viewed month and year
 function initializeCalendar() {
     const savedDate = JSON.parse(localStorage.getItem('lastViewedDate'));
     if (savedDate) {
-        currentMonth = savedDate.month;
-        currentYear = savedDate.year;
-    } else {
-        const now = new Date();
-        currentMonth = now.getMonth();
-        currentYear = now.getFullYear();
+        window.currentMonth = savedDate.month;
+        window.currentYear = savedDate.year;
     }
-    generateCalendar(currentMonth, currentYear);
+    generateCalendar(window.currentMonth, window.currentYear);
 }
 
 function getOregonTime() {
-    const oregonOffset = -8 * 60; // UTC offset for Oregon (PST)
+    const oregonOffset = -8 * 60; // UTC offset for PST
     const currentUtcTime = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
     return new Date(currentUtcTime + oregonOffset * 60000);
 }
@@ -32,7 +31,7 @@ function generateCalendar(month, year) {
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
 
     for (let i = 0; i < firstDay; i++) {
-        calendarContainer.appendChild(document.createElement('div'));
+        calendarContainer.appendChild(document.createElement('div')); // Empty spaces for alignment
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -74,47 +73,47 @@ function toggleWorkday(dayDiv, day) {
 }
 
 function prevMonth() {
-    currentMonth--;
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
+    window.currentMonth--;
+    if (window.currentMonth < 0) {
+        window.currentMonth = 11;
+        window.currentYear--;
     }
-    generateCalendar(currentMonth, currentYear);
+    generateCalendar(window.currentMonth, window.currentYear);
     saveLastViewedDate();
 }
 
 function nextMonth() {
-    currentMonth++;
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
+    window.currentMonth++;
+    if (window.currentMonth > 11) {
+        window.currentMonth = 0;
+        window.currentYear++;
     }
-    generateCalendar(currentMonth, currentYear);
+    generateCalendar(window.currentMonth, window.currentYear);
     saveLastViewedDate();
 }
 
 function saveLastViewedDate() {
-    localStorage.setItem('lastViewedDate', JSON.stringify({ month: currentMonth, year: currentYear }));
+    localStorage.setItem('lastViewedDate', JSON.stringify({ month: window.currentMonth, year: window.currentYear }));
 }
 
 function saveCalendarState() {
     const workDays = [];
     const checkedDays = [];
     document.querySelectorAll('#calendar .day.work').forEach(div => {
-        const dayInfo = { day: div.innerText, month: currentMonth, year: currentYear };
+        const dayInfo = { day: div.innerText, month: window.currentMonth, year: window.currentYear };
         workDays.push(dayInfo);
         if (div.classList.contains('checked')) {
             checkedDays.push(dayInfo);
         }
     });
 
-    const key = `calendar_${currentMonth}_${currentYear}`;
+    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
     localStorage.setItem(key, JSON.stringify({ workDays, checkedDays }));
     updateShiftCountdown();
 }
 
 function loadCalendarState() {
-    const key = `calendar_${currentMonth}_${currentYear}`;
+    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
     const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
     const dayDivs = document.querySelectorAll('#calendar .day');
 
@@ -149,7 +148,7 @@ function loadCalendarState() {
 }
 
 function updateShiftCountdown() {
-    const key = `calendar_${currentMonth}_${currentYear}`;
+    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
     const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
     const shiftsLeft = storedData.workDays.length - storedData.checkedDays.length;
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
@@ -169,4 +168,5 @@ function confettiEffect() {
     }
 }
 
+// Run initialization when the page loads
 window.onload = initializeCalendar;
