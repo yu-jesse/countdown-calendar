@@ -76,32 +76,44 @@ function nextMonth() {
 }
 
 function saveCalendarState() {
-    const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
-    const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
+    let workDays = JSON.parse(localStorage.getItem('workDays')) || [];
+    let checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
     document.querySelectorAll('#calendar .day.work').forEach(div => {
         const workDay = { day: div.innerText, month: currentMonth, year: currentYear };
+        
+        // Add the workday to the array if it doesn't already exist
         if (!workDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
             workDays.push(workDay);
         }
+        
+        // Save checked days as completed shifts
         if (div.classList.contains('checked')) {
             if (!checkedDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
                 checkedDays.push(workDay);
             }
         }
     });
+    
+    // Store all workdays and checked days across all months
     localStorage.setItem('workDays', JSON.stringify(workDays));
     localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
 }
+
 
 function loadCalendarState() {
     const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
     const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
     const dayDivs = document.querySelectorAll('#calendar .day');
+    
     dayDivs.forEach(div => {
         const dayInfo = { day: div.innerText, month: currentMonth, year: currentYear };
+        
+        // Add 'work' class if the day is saved as a workday
         if (workDays.some(d => d.day == dayInfo.day && d.month == dayInfo.month && d.year == dayInfo.year)) {
             div.classList.add('work');
         }
+        
+        // Add 'checked' class and check the checkbox if the day is marked as completed
         if (checkedDays.some(d => d.day == dayInfo.day && d.month == dayInfo.month && d.year == dayInfo.year)) {
             div.classList.add('checked');
             if (!div.querySelector('.checkbox')) {
@@ -120,15 +132,22 @@ function loadCalendarState() {
             }
         }
     });
+    
+    // Update shift countdown after loading calendar state
     updateShiftCountdown();
 }
 
+
 function updateShiftCountdown() {
+    // Fetch all saved workdays and checked days across all months
     const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
     const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
+    
+    // Calculate shifts left by subtracting completed shifts from total workdays
     const shiftsLeft = workDays.length - checkedDays.length;
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
+
 
 function confettiEffect() {
     for (let i = 0; i < 100; i++) {
