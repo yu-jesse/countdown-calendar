@@ -1,4 +1,4 @@
-// Ensure global variables are only declared once
+// Ensure global variables exist once
 if (typeof window.currentMonth === 'undefined') {
     window.currentMonth = new Date().getMonth();
     window.currentYear = new Date().getFullYear();
@@ -37,6 +37,18 @@ function generateCalendar(month, year) {
             dayDiv.classList.add('highlight');
         }
 
+        // Add hidden checkbox
+        const checkBoxElement = document.createElement('input');
+        checkBoxElement.type = 'checkbox';
+        checkBoxElement.classList.add('checkbox');
+        checkBoxElement.onclick = function (event) {
+            event.stopPropagation();
+            dayDiv.classList.toggle('checked');
+            saveCalendarState();
+            updateShiftCountdown();
+        };
+        dayDiv.appendChild(checkBoxElement);
+
         dayDiv.onclick = function () {
             toggleWorkday(dayDiv, day);
         };
@@ -49,18 +61,6 @@ function generateCalendar(month, year) {
 
 function toggleWorkday(dayDiv, day) {
     dayDiv.classList.toggle('work');
-    if (!dayDiv.querySelector('.checkbox')) {
-        const checkBoxElement = document.createElement('input');
-        checkBoxElement.type = 'checkbox';
-        checkBoxElement.classList.add('checkbox');
-        checkBoxElement.onclick = function (event) {
-            event.stopPropagation();
-            dayDiv.classList.toggle('checked');
-            saveCalendarState();
-            updateShiftCountdown();
-        };
-        dayDiv.appendChild(checkBoxElement);
-    }
     saveCalendarState();
     updateShiftCountdown();
 }
@@ -89,15 +89,31 @@ function saveLastViewedDate() {
     localStorage.setItem('lastViewedDate', JSON.stringify({ month: window.currentMonth, year: window.currentYear }));
 }
 
+function saveCalendarState() {
+    const workDays = [];
+    const checkedDays = [];
+
+    document.querySelectorAll('#calendar .day.work').forEach(div => {
+        const dayInfo = { day: div.innerText, month: window.currentMonth, year: window.currentYear };
+        workDays.push(dayInfo);
+        if (div.classList.contains('checked')) {
+            checkedDays.push(dayInfo);
+        }
+    });
+
+    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
+    localStorage.setItem(key, JSON.stringify({ workDays, checkedDays }));
+
+    updateShiftCountdown();
+}
+
 function updateShiftCountdown() {
     let totalWorkDays = 0;
     let totalCheckedDays = 0;
 
-    // Loop through all stored keys in localStorage
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
 
-        // Only process keys related to calendar data
         if (key.startsWith('calendar_')) {
             const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
             totalWorkDays += storedData.workDays.length;
@@ -105,7 +121,6 @@ function updateShiftCountdown() {
         }
     }
 
-    // Calculate shifts left
     const shiftsLeft = totalWorkDays - totalCheckedDays;
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }

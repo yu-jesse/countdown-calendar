@@ -84,20 +84,16 @@ h1 {
     position: absolute;
     top: 5px;
     right: 5px;
-    opacity: 0;  /* Hidden by default */
+    opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
 
-/* Show checkbox when hovering over a day */
-.day:hover .checkbox {
+/* Show checkbox on hover */
+.day:hover .checkbox, .day.checked .checkbox {
     opacity: 1;
 }
 
-/* Keep checkbox visible if it's checked */
-.day.checked .checkbox {
-    opacity: 1;
-}
-
+/* Cross out checked shifts */
 .day.checked {
     text-decoration: line-through;
 }
