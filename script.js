@@ -92,24 +92,10 @@ function generateCalendar(month, year) {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // Weekday labels
 
     // ✅ Reset calendar display
     calendarContainer.innerHTML = '';
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
-
-    // ✅ Create Weekday Row
-    const weekdaysRow = document.createElement('div');
-    weekdaysRow.classList.add('weekdays-row');
-
-    weekdays.forEach(day => {
-        const dayLabel = document.createElement('div');
-        dayLabel.classList.add('weekday');
-        dayLabel.innerText = day;
-        weekdaysRow.appendChild(dayLabel);
-    });
-
-    calendarContainer.appendChild(weekdaysRow); // ✅ Add weekday row at the top
 
     // ✅ Generate Empty Spaces for Alignment
     for (let i = 0; i < firstDay; i++) {
