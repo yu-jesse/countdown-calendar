@@ -27,12 +27,14 @@ function generateCalendar() {
         dayDiv.onclick = function() {
             if (dayDiv.classList.contains('work')) {
                 dayDiv.classList.toggle('checked');
+                saveCalendarState();
                 confettiEffect();
                 updateShiftCountdown();
             }
         };
         calendarContainer.appendChild(dayDiv);
     }
+    loadCalendarState();
 }
 
 function addWorkDay() {
@@ -42,10 +44,39 @@ function addWorkDay() {
         dayDivs.forEach(div => {
             if (div.innerText == day) {
                 div.classList.add('work');
+                saveCalendarState();
                 updateShiftCountdown();
             }
         });
     }
+}
+
+function saveCalendarState() {
+    const workDays = [];
+    const checkedDays = [];
+    document.querySelectorAll('#calendar .day.work').forEach(div => {
+        workDays.push(div.innerText);
+        if (div.classList.contains('checked')) {
+            checkedDays.push(div.innerText);
+        }
+    });
+    localStorage.setItem('workDays', JSON.stringify(workDays));
+    localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
+}
+
+function loadCalendarState() {
+    const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
+    const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
+    const dayDivs = document.querySelectorAll('#calendar .day');
+    dayDivs.forEach(div => {
+        if (workDays.includes(div.innerText)) {
+            div.classList.add('work');
+        }
+        if (checkedDays.includes(div.innerText)) {
+            div.classList.add('checked');
+        }
+    });
+    updateShiftCountdown();
 }
 
 function updateShiftCountdown() {
@@ -71,5 +102,4 @@ function confettiEffect() {
 
 window.onload = function() {
     generateCalendar();
-    updateShiftCountdown();
 };
