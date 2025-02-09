@@ -1,8 +1,21 @@
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
+let currentMonth, currentYear;
+
+// Fetch last viewed month and year
+function initializeCalendar() {
+    const savedDate = JSON.parse(localStorage.getItem('lastViewedDate'));
+    if (savedDate) {
+        currentMonth = savedDate.month;
+        currentYear = savedDate.year;
+    } else {
+        const now = new Date();
+        currentMonth = now.getMonth();
+        currentYear = now.getFullYear();
+    }
+    generateCalendar(currentMonth, currentYear);
+}
 
 function getOregonTime() {
-    const oregonOffset = -8 * 60; // UTC offset for Oregon (Pacific Standard Time)
+    const oregonOffset = -8 * 60; // UTC offset for Oregon (PST)
     const currentUtcTime = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
     return new Date(currentUtcTime + oregonOffset * 60000);
 }
@@ -19,7 +32,7 @@ function generateCalendar(month, year) {
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
 
     for (let i = 0; i < firstDay; i++) {
-        calendarContainer.appendChild(document.createElement('div')); // Empty spaces for alignment
+        calendarContainer.appendChild(document.createElement('div'));
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -32,29 +45,32 @@ function generateCalendar(month, year) {
         }
 
         dayDiv.onclick = function () {
-            dayDiv.classList.toggle('work');
-            const checkbox = dayDiv.querySelector('.checkbox');
-            if (!checkbox) {
-                const checkBoxElement = document.createElement('input');
-                checkBoxElement.type = 'checkbox';
-                checkBoxElement.classList.add('checkbox');
-                checkBoxElement.onclick = function (event) {
-                    event.stopPropagation();
-                    dayDiv.classList.toggle('checked');
-                    saveCalendarState();
-                    confettiEffect();
-                    updateShiftCountdown();
-                };
-                dayDiv.appendChild(checkBoxElement);
-            }
-            saveCalendarState();
-            updateShiftCountdown();
+            toggleWorkday(dayDiv, day);
         };
 
         calendarContainer.appendChild(dayDiv);
     }
 
     loadCalendarState();
+}
+
+function toggleWorkday(dayDiv, day) {
+    dayDiv.classList.toggle('work');
+    if (!dayDiv.querySelector('.checkbox')) {
+        const checkBoxElement = document.createElement('input');
+        checkBoxElement.type = 'checkbox';
+        checkBoxElement.classList.add('checkbox');
+        checkBoxElement.onclick = function (event) {
+            event.stopPropagation();
+            dayDiv.classList.toggle('checked');
+            saveCalendarState();
+            confettiEffect();
+            updateShiftCountdown();
+        };
+        dayDiv.appendChild(checkBoxElement);
+    }
+    saveCalendarState();
+    updateShiftCountdown();
 }
 
 function prevMonth() {
@@ -64,6 +80,7 @@ function prevMonth() {
         currentYear--;
     }
     generateCalendar(currentMonth, currentYear);
+    saveLastViewedDate();
 }
 
 function nextMonth() {
@@ -73,71 +90,44 @@ function nextMonth() {
         currentYear++;
     }
     generateCalendar(currentMonth, currentYear);
+    saveLastViewedDate();
+}
+
+function saveLastViewedDate() {
+    localStorage.setItem('lastViewedDate', JSON.stringify({ month: currentMonth, year: currentYear }));
 }
 
 function saveCalendarState() {
-    // Get current month and year
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-
-    // Load all workdays and checked days from localStorage
-    let workDays = JSON.parse(localStorage.getItem('workDays')) || [];
-    let checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
-
-    // Loop through all day elements to save selected workdays
-    document.querySelectorAll('#calendar .day').forEach(div => {
-        const day = div.innerText;
-        if (!day) return; // Skip if the day is empty
-
-        const workDay = { day, month: currentMonth, year: currentYear };
-
-        // Add workday if it's not already in the list
-        if (!workDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
-            workDays.push(workDay);
-        }
-
-        // Save checked days (completed shifts)
+    const workDays = [];
+    const checkedDays = [];
+    document.querySelectorAll('#calendar .day.work').forEach(div => {
+        const dayInfo = { day: div.innerText, month: currentMonth, year: currentYear };
+        workDays.push(dayInfo);
         if (div.classList.contains('checked')) {
-            if (!checkedDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
-                checkedDays.push(workDay);
-            }
+            checkedDays.push(dayInfo);
         }
     });
 
-    // Store updated workdays and checked days
-    localStorage.setItem('workDays', JSON.stringify(workDays));
-    localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
-
-    // Update shift countdown after saving state
+    const key = `calendar_${currentMonth}_${currentYear}`;
+    localStorage.setItem(key, JSON.stringify({ workDays, checkedDays }));
     updateShiftCountdown();
 }
 
-
-
 function loadCalendarState() {
-    const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
-    const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
+    const key = `calendar_${currentMonth}_${currentYear}`;
+    const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
     const dayDivs = document.querySelectorAll('#calendar .day');
 
-    // Get current month and year
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-
-    // Loop through all the day divs to load workdays and checkboxes
     dayDivs.forEach(div => {
         const day = div.innerText;
-        if (!day) return; // Skip if the day is empty
+        if (!day) return;
 
-        // Check if this day is a workday for the current month/year
-        const workDay = { day, month: currentMonth, year: currentYear };
-        if (workDays.some(d => d.day == day && d.month == currentMonth && d.year == currentYear)) {
+        if (storedData.workDays.some(d => d.day == day)) {
             div.classList.add('work');
         }
 
-        // Mark the day as checked if it was previously completed
-        if (checkedDays.some(d => d.day == day && d.month == currentMonth && d.year == currentYear)) {
+        if (storedData.checkedDays.some(d => d.day == day)) {
             div.classList.add('checked');
-            // Add checkbox if not already there
             if (!div.querySelector('.checkbox')) {
                 const checkBoxElement = document.createElement('input');
                 checkBoxElement.type = 'checkbox';
@@ -146,38 +136,27 @@ function loadCalendarState() {
                 checkBoxElement.onclick = function (event) {
                     event.stopPropagation();
                     div.classList.toggle('checked');
-                    saveCalendarState(); // Save updated state
-                    confettiEffect();    // Trigger confetti effect (if applicable)
-                    updateShiftCountdown(); // Update shift countdown
+                    saveCalendarState();
+                    confettiEffect();
+                    updateShiftCountdown();
                 };
                 div.appendChild(checkBoxElement);
             }
         }
     });
 
-    // Update shift countdown when loading state
     updateShiftCountdown();
 }
 
-
-
 function updateShiftCountdown() {
-    // Get all saved workdays and checked days from localStorage
-    const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
-    const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
-
-    // Count the shifts left (workdays not checked off)
-    const shiftsLeft = workDays.length - checkedDays.length;
-
-    // Update the countdown display
+    const key = `calendar_${currentMonth}_${currentYear}`;
+    const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
+    const shiftsLeft = storedData.workDays.length - storedData.checkedDays.length;
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
 
-
-
-
 function confettiEffect() {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 30; i++) {
         let confetti = document.createElement('div');
         confetti.classList.add('confetti');
         document.body.appendChild(confetti);
@@ -186,10 +165,8 @@ function confettiEffect() {
         confetti.style.top = Math.random() * window.innerHeight + 'px';
         confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
 
-        setTimeout(() => { confetti.remove(); }, 3000); // Remove confetti after 3 seconds
+        setTimeout(() => confetti.remove(), 2000);
     }
 }
 
-window.onload = function () {
-    generateCalendar(currentMonth, currentYear);
-};
+window.onload = initializeCalendar;
