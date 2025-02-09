@@ -129,6 +129,27 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
+/* ✅ Style the Weekday Row */
+.weekdays-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for weekdays */
+    gap: 5px;
+    text-align: center;
+    font-weight: bold;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ccc; /* Underline for separation */
+}
+
+/* ✅ Style Individual Weekday Labels */
+.weekday {
+    padding: 10px;
+    background: #f8f9fa;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
 
 /* Fix: Ensure Main Content is Visible */
 .container {

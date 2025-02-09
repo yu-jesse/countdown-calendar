@@ -91,10 +91,24 @@ function generateCalendar(month, year) {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // Weekday names
 
-    // ✅ Reset calendar content
+    // ✅ Reset calendar display
     calendarContainer.innerHTML = '';
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
+
+    // ✅ Create Weekday Headers
+    const weekdaysRow = document.createElement('div');
+    weekdaysRow.classList.add('weekdays-row');
+    
+    weekdays.forEach(day => {
+        const dayLabel = document.createElement('div');
+        dayLabel.classList.add('weekday');
+        dayLabel.innerText = day;
+        weekdaysRow.appendChild(dayLabel);
+    });
+
+    calendarContainer.appendChild(weekdaysRow);
 
     // ✅ Add Empty Divs for Alignment (First Row Offset)
     for (let i = 0; i < firstDay; i++) {
@@ -114,7 +128,7 @@ function generateCalendar(month, year) {
             dayDiv.classList.add('highlight');
         }
 
-        // ✅ Add Checkboxes
+        // ✅ Add Checkboxes for Workdays
         const checkBoxElement = document.createElement('input');
         checkBoxElement.type = 'checkbox';
         checkBoxElement.classList.add('checkbox');
@@ -126,7 +140,7 @@ function generateCalendar(month, year) {
         };
         dayDiv.appendChild(checkBoxElement);
 
-        // ✅ Workday Selection
+        // ✅ Handle Workday Selection
         dayDiv.onclick = function () {
             toggleWorkday(dayDiv, day);
         };
@@ -137,6 +151,7 @@ function generateCalendar(month, year) {
     // ✅ Load Saved Data
     loadCalendarState();
 }
+
 
 
 
