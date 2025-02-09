@@ -13,16 +13,10 @@ function initializeCalendar() {
     generateCalendar(window.currentMonth, window.currentYear);
 }
 
-function getOregonTime() {
-    const oregonOffset = -8 * 60; // UTC offset for PST
-    const currentUtcTime = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
-    return new Date(currentUtcTime + oregonOffset * 60000);
-}
-
 function generateCalendar(month, year) {
     const calendarContainer = document.getElementById('calendar');
     const monthYearDisplay = document.getElementById('monthYear');
-    const today = getOregonTime();
+    const today = new Date();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -63,7 +57,6 @@ function toggleWorkday(dayDiv, day) {
             event.stopPropagation();
             dayDiv.classList.toggle('checked');
             saveCalendarState();
-            confettiEffect();
             updateShiftCountdown();
         };
         dayDiv.appendChild(checkBoxElement);
@@ -96,76 +89,25 @@ function saveLastViewedDate() {
     localStorage.setItem('lastViewedDate', JSON.stringify({ month: window.currentMonth, year: window.currentYear }));
 }
 
-function saveCalendarState() {
-    const workDays = [];
-    const checkedDays = [];
-    document.querySelectorAll('#calendar .day.work').forEach(div => {
-        const dayInfo = { day: div.innerText, month: window.currentMonth, year: window.currentYear };
-        workDays.push(dayInfo);
-        if (div.classList.contains('checked')) {
-            checkedDays.push(dayInfo);
-        }
-    });
-
-    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
-    localStorage.setItem(key, JSON.stringify({ workDays, checkedDays }));
-    updateShiftCountdown();
-}
-
-function loadCalendarState() {
-    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
-    const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
-    const dayDivs = document.querySelectorAll('#calendar .day');
-
-    dayDivs.forEach(div => {
-        const day = div.innerText;
-        if (!day) return;
-
-        if (storedData.workDays.some(d => d.day == day)) {
-            div.classList.add('work');
-        }
-
-        if (storedData.checkedDays.some(d => d.day == day)) {
-            div.classList.add('checked');
-            if (!div.querySelector('.checkbox')) {
-                const checkBoxElement = document.createElement('input');
-                checkBoxElement.type = 'checkbox';
-                checkBoxElement.classList.add('checkbox');
-                checkBoxElement.checked = true;
-                checkBoxElement.onclick = function (event) {
-                    event.stopPropagation();
-                    div.classList.toggle('checked');
-                    saveCalendarState();
-                    confettiEffect();
-                    updateShiftCountdown();
-                };
-                div.appendChild(checkBoxElement);
-            }
-        }
-    });
-
-    updateShiftCountdown();
-}
-
 function updateShiftCountdown() {
-    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
-    const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
-    const shiftsLeft = storedData.workDays.length - storedData.checkedDays.length;
-    document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
-}
+    let totalWorkDays = 0;
+    let totalCheckedDays = 0;
 
-function confettiEffect() {
-    for (let i = 0; i < 30; i++) {
-        let confetti = document.createElement('div');
-        confetti.classList.add('confetti');
-        document.body.appendChild(confetti);
+    // Loop through all stored keys in localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
 
-        confetti.style.left = Math.random() * window.innerWidth + 'px';
-        confetti.style.top = Math.random() * window.innerHeight + 'px';
-        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-
-        setTimeout(() => confetti.remove(), 2000);
+        // Only process keys related to calendar data
+        if (key.startsWith('calendar_')) {
+            const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
+            totalWorkDays += storedData.workDays.length;
+            totalCheckedDays += storedData.checkedDays.length;
+        }
     }
+
+    // Calculate shifts left
+    const shiftsLeft = totalWorkDays - totalCheckedDays;
+    document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
 
 // Run initialization when the page loads
