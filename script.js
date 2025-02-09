@@ -76,16 +76,23 @@ function nextMonth() {
 }
 
 function saveCalendarState() {
+    // Get saved workdays and checked days from localStorage or initialize as empty arrays
     let workDays = JSON.parse(localStorage.getItem('workDays')) || [];
     let checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
+
     document.querySelectorAll('#calendar .day.work').forEach(div => {
-        const workDay = { day: div.innerText, month: currentMonth, year: currentYear };
-        
+        const day = div.innerText;
+        const month = currentMonth;
+        const year = currentYear;
+
+        // Create a unique workday object including the year and month
+        const workDay = { day, month, year };
+
         // Add the workday to the array if it doesn't already exist
         if (!workDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
             workDays.push(workDay);
         }
-        
+
         // Save checked days as completed shifts
         if (div.classList.contains('checked')) {
             if (!checkedDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
@@ -93,29 +100,33 @@ function saveCalendarState() {
             }
         }
     });
-    
-    // Store all workdays and checked days across all months
+
+    // Store the workdays and checked days across all months in localStorage
     localStorage.setItem('workDays', JSON.stringify(workDays));
     localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
 }
+
 
 
 function loadCalendarState() {
     const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
     const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
     const dayDivs = document.querySelectorAll('#calendar .day');
-    
+
     dayDivs.forEach(div => {
-        const dayInfo = { day: div.innerText, month: currentMonth, year: currentYear };
-        
-        // Add 'work' class if the day is saved as a workday
-        if (workDays.some(d => d.day == dayInfo.day && d.month == dayInfo.month && d.year == dayInfo.year)) {
+        const day = div.innerText;
+        const month = currentMonth;
+        const year = currentYear;
+
+        // Check if this day is a workday
+        if (workDays.some(d => d.day == day && d.month == month && d.year == year)) {
             div.classList.add('work');
         }
-        
-        // Add 'checked' class and check the checkbox if the day is marked as completed
-        if (checkedDays.some(d => d.day == dayInfo.day && d.month == dayInfo.month && d.year == dayInfo.year)) {
+
+        // Mark it as checked if it's already completed
+        if (checkedDays.some(d => d.day == day && d.month == month && d.year == year)) {
             div.classList.add('checked');
+            // Create and append a checkbox if it doesn't already exist
             if (!div.querySelector('.checkbox')) {
                 const checkBoxElement = document.createElement('input');
                 checkBoxElement.type = 'checkbox';
@@ -124,29 +135,33 @@ function loadCalendarState() {
                 checkBoxElement.onclick = function (event) {
                     event.stopPropagation();
                     div.classList.toggle('checked');
-                    saveCalendarState();
-                    confettiEffect();
-                    updateShiftCountdown();
+                    saveCalendarState();  // Save updated state
+                    confettiEffect();     // Trigger confetti effect
+                    updateShiftCountdown(); // Update shift countdown
                 };
                 div.appendChild(checkBoxElement);
             }
         }
     });
-    
-    // Update shift countdown after loading calendar state
+
+    // Update shift countdown when loading state
     updateShiftCountdown();
 }
 
 
+
 function updateShiftCountdown() {
-    // Fetch all saved workdays and checked days across all months
+    // Get all saved workdays and checked days from localStorage
     const workDays = JSON.parse(localStorage.getItem('workDays')) || [];
     const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
-    
-    // Calculate shifts left by subtracting completed shifts from total workdays
+
+    // Count the shifts left (workdays not checked off)
     const shiftsLeft = workDays.length - checkedDays.length;
+
+    // Update the countdown display
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
+
 
 
 function confettiEffect() {
