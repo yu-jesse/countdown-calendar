@@ -76,24 +76,27 @@ function nextMonth() {
 }
 
 function saveCalendarState() {
-    // Get saved workdays and checked days from localStorage or initialize as empty arrays
+    // Get saved workdays and checked days from localStorage
     let workDays = JSON.parse(localStorage.getItem('workDays')) || [];
     let checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
 
-    document.querySelectorAll('#calendar .day.work').forEach(div => {
+    // Get current month and year
+    const currentMonth = new Date().getMonth(); // 0 to 11 (January to December)
+    const currentYear = new Date().getFullYear();
+
+    // Loop through all day elements to save selected workdays
+    document.querySelectorAll('#calendar .day').forEach(div => {
         const day = div.innerText;
-        const month = currentMonth;
-        const year = currentYear;
+        if (!day) return; // Skip if the day is empty
 
-        // Create a unique workday object including the year and month
-        const workDay = { day, month, year };
+        const workDay = { day, month: currentMonth, year: currentYear };
 
-        // Add the workday to the array if it doesn't already exist
+        // Only add workday if it's not already in the list
         if (!workDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
             workDays.push(workDay);
         }
 
-        // Save checked days as completed shifts
+        // Save the checked workdays (completed shifts)
         if (div.classList.contains('checked')) {
             if (!checkedDays.some(d => d.day == workDay.day && d.month == workDay.month && d.year == workDay.year)) {
                 checkedDays.push(workDay);
@@ -101,9 +104,12 @@ function saveCalendarState() {
         }
     });
 
-    // Store the workdays and checked days across all months in localStorage
+    // Store workdays and checked days in localStorage
     localStorage.setItem('workDays', JSON.stringify(workDays));
     localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
+
+    // Update shift countdown after saving state
+    updateShiftCountdown();
 }
 
 
@@ -113,20 +119,25 @@ function loadCalendarState() {
     const checkedDays = JSON.parse(localStorage.getItem('checkedDays')) || [];
     const dayDivs = document.querySelectorAll('#calendar .day');
 
+    // Get current month and year
+    const currentMonth = new Date().getMonth(); // 0 to 11 (January to December)
+    const currentYear = new Date().getFullYear();
+
+    // Loop through all the day divs to load workdays and checkboxes
     dayDivs.forEach(div => {
         const day = div.innerText;
-        const month = currentMonth;
-        const year = currentYear;
+        if (!day) return; // Skip if the day is empty
 
-        // Check if this day is a workday
-        if (workDays.some(d => d.day == day && d.month == month && d.year == year)) {
+        // Check if this day is a workday for the current month/year
+        const workDay = { day, month: currentMonth, year: currentYear };
+        if (workDays.some(d => d.day == day && d.month == currentMonth && d.year == currentYear)) {
             div.classList.add('work');
         }
 
-        // Mark it as checked if it's already completed
-        if (checkedDays.some(d => d.day == day && d.month == month && d.year == year)) {
+        // Mark the day as checked if it was previously completed
+        if (checkedDays.some(d => d.day == day && d.month == currentMonth && d.year == currentYear)) {
             div.classList.add('checked');
-            // Create and append a checkbox if it doesn't already exist
+            // Add checkbox if not already there
             if (!div.querySelector('.checkbox')) {
                 const checkBoxElement = document.createElement('input');
                 checkBoxElement.type = 'checkbox';
@@ -135,8 +146,8 @@ function loadCalendarState() {
                 checkBoxElement.onclick = function (event) {
                     event.stopPropagation();
                     div.classList.toggle('checked');
-                    saveCalendarState();  // Save updated state
-                    confettiEffect();     // Trigger confetti effect
+                    saveCalendarState(); // Save updated state
+                    confettiEffect();    // Trigger confetti effect (if applicable)
                     updateShiftCountdown(); // Update shift countdown
                 };
                 div.appendChild(checkBoxElement);
@@ -147,6 +158,7 @@ function loadCalendarState() {
     // Update shift countdown when loading state
     updateShiftCountdown();
 }
+
 
 
 
@@ -161,6 +173,7 @@ function updateShiftCountdown() {
     // Update the countdown display
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
+
 
 
 
