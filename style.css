@@ -32,6 +32,8 @@ body {
 
 /* Restore Sidebar Month Buttons Layout */
 #monthButtons {
+    background: #ff9800;
+    color: white;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 5px;

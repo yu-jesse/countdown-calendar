@@ -4,16 +4,6 @@ if (typeof window.currentMonth === 'undefined') {
     window.currentYear = new Date().getFullYear();
 }
 
-function initializeCalendar() {
-    createSidebar();
-    const savedDate = JSON.parse(localStorage.getItem('lastViewedDate'));
-    if (savedDate) {
-        window.currentMonth = savedDate.month;
-        window.currentYear = savedDate.year;
-    }
-    generateCalendar(window.currentMonth, window.currentYear);
-}
-
 // 🛠 Function to generate sidebar (Buttons & Year Selector)
 function createSidebar() {
     const monthButtons = document.getElementById('monthButtons');
@@ -45,16 +35,25 @@ function createSidebar() {
 }
 
 function jumpToMonth(selectedMonth) {
+    // ✅ Remove highlight from all month buttons
+    document.querySelectorAll("#monthButtons button").forEach(btn => btn.classList.remove("active"));
+
+    // ✅ Set new active button
     currentMonth = selectedMonth;
-    localStorage.setItem("selectedMonth", currentMonth); // Store month
+    localStorage.setItem("selectedMonth", currentMonth);
     generateCalendar(currentMonth, currentYear);
+
+    // ✅ Highlight the selected month button
+    event.target.classList.add("active");
 }
+
 
 function changeYear() {
     currentYear = parseInt(document.getElementById("yearSelector").value, 10);
-    localStorage.setItem("selectedYear", currentYear); // Store year
-    generateCalendar(currentMonth, currentYear);
+    localStorage.setItem("selectedYear", currentYear); // ✅ Store year
+    generateCalendar(currentMonth, currentYear); // ✅ Refresh calendar
 }
+
 
 function jumpToToday() {
     const today = new Date();
@@ -209,7 +208,6 @@ function updateShiftCountdown() {
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
 
-// Load stored month and year on page load
 window.onload = function () {
     const savedMonth = localStorage.getItem("selectedMonth");
     const savedYear = localStorage.getItem("selectedYear");
@@ -220,4 +218,5 @@ window.onload = function () {
     }
 
     generateCalendar(currentMonth, currentYear);
+    updateShiftCountdown(); // ✅ Ensure shift count updates when page loads
 };
