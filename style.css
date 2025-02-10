@@ -51,6 +51,7 @@ body {
     transition: background 0.3s, transform 0.2s;
     display: block; /* ✅ Ensure buttons are displayed */
 }
+
 /* Restore Hover Effect */
 #monthButtons button:hover {
     background: #555;

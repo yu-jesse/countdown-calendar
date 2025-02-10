@@ -208,7 +208,23 @@ function updateShiftCountdown() {
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
 
+function createSidebar() {
+    const monthButtons = document.getElementById("monthButtons");
+    monthButtons.innerHTML = ""; // ✅ Clear previous buttons before adding new ones
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    monthNames.forEach((month, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = month;
+        btn.onclick = () => jumpToMonth(index);
+        monthButtons.appendChild(btn);
+    });
+
+    console.log("Sidebar buttons created:", monthButtons.innerHTML); // ✅ Debugging
+}
+
 window.onload = function () {
+    createSidebar(); // ✅ Make sure sidebar buttons are created
     const savedMonth = localStorage.getItem("selectedMonth");
     const savedYear = localStorage.getItem("selectedYear");
 
