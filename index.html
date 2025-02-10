@@ -5,35 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Countdown Calendar</title>
     <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
 </head>
 <body>
-    <!-- Dark Mode Toggle -->
-    <div class="toggle-container">
-        <button id="darkModeToggle">Toggle Dark Mode</button>
-    </div>
-    
-    <!-- Sidebar for Navigation -->
     <div class="sidebar">
         <h2>Select Month</h2>
         <div id="monthButtons"></div>
         <h2>Select Year</h2>
         <select id="yearSelector"></select>
-        <button id="today-btn">Today</button>
+        <button id="todayButton">Today</button>
     </div>
-    
-    <!-- Main Calendar Content -->
-    <div class="main-content">
+
+    <div class="container">
         <h1>Shift Countdown Calendar</h1>
-        <div class="shifts-left-container">
-            <h2 id="shifts-left">Shifts left: <span id="shift-count">0</span></h2>
+        <div class="header">
+            <button onclick="prevMonth()">❮</button>
+            <div id="monthYear"></div>
+            <button onclick="nextMonth()">❯</button>
         </div>
-        <div class="calendar">
-            <button id="prev-month" class="month-nav">&#9665;</button>
-            <div id="current-month"></div>
-            <button id="next-month" class="month-nav">&#9655;</button>
-            <div id="calendar-grid"></div>
-        </div>
+        <div id="shiftCountdown">Shifts left: 0</div>
+        <div id="calendar"></div>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>

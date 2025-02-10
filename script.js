@@ -1,87 +1,223 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const monthSelector = document.getElementById("monthButtons");
-    const yearSelector = document.getElementById("yearSelector");
-    const todayBtn = document.getElementById("today-btn");
-    const prevMonthBtn = document.getElementById("prev-month");
-    const nextMonthBtn = document.getElementById("next-month");
-    const currentMonthDisplay = document.getElementById("current-month");
-    const shiftCountDisplay = document.getElementById("shift-count");
-    const darkModeToggle = document.getElementById("darkModeToggle");
-    const body = document.body;
+// Ensure global variables exist once
+if (typeof window.currentMonth === 'undefined') {
+    window.currentMonth = new Date().getMonth();
+    window.currentYear = new Date().getFullYear();
+}
 
-    let currentDate = new Date();
+function initializeCalendar() {
+    createSidebar();
+    const savedDate = JSON.parse(localStorage.getItem('lastViewedDate'));
+    if (savedDate) {
+        window.currentMonth = savedDate.month;
+        window.currentYear = savedDate.year;
+    }
+    generateCalendar(window.currentMonth, window.currentYear);
+}
 
-    // 🌙 Dark Mode Toggle
-    if (localStorage.getItem("darkMode") === "enabled") {
-        body.classList.add("dark-mode");
+// 🛠 Function to generate sidebar (Buttons & Year Selector)
+function createSidebar() {
+    const monthButtons = document.getElementById('monthButtons');
+    const yearSelector = document.getElementById('yearSelector');
+
+    // Add month buttons
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    monthNames.forEach((month, index) => {
+        const btn = document.createElement('button');
+        btn.innerText = month;
+        btn.onclick = () => jumpToMonth(index);
+        monthButtons.appendChild(btn);
+    });
+
+    // Populate year dropdown (range 2000 - 2050)
+    for (let year = 2000; year <= 2050; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.innerText = year;
+        yearSelector.appendChild(option);
     }
 
-    darkModeToggle.addEventListener("click", function () {
-        body.classList.toggle("dark-mode");
-        localStorage.setItem("darkMode", body.classList.contains("dark-mode") ? "enabled" : "disabled");
-    });
+    // Set default selected year
+    yearSelector.value = window.currentYear;
+    yearSelector.onchange = () => changeYear(yearSelector.value);
 
-    // 📅 Ensure Sidebar Month/Year Selection Persists
-    const savedMonth = localStorage.getItem("selectedMonth");
-    const savedYear = localStorage.getItem("selectedYear");
+    // Today button functionality
+    document.getElementById('todayButton').onclick = jumpToToday;
+}
 
-    if (savedMonth !== null) currentDate.setMonth(parseInt(savedMonth));
-    if (savedYear !== null) currentDate.setFullYear(parseInt(savedYear));
+function jumpToMonth(selectedMonth) {
+    currentMonth = selectedMonth;
+    localStorage.setItem("selectedMonth", currentMonth); // Store month
+    generateCalendar(currentMonth, currentYear);
+}
 
-    function updateCalendar() {
-        currentMonthDisplay.textContent = currentDate.toLocaleString("default", { month: "long", year: "numeric" });
-        localStorage.setItem("selectedMonth", currentDate.getMonth());
-        localStorage.setItem("selectedYear", currentDate.getFullYear());
-    }
+function changeYear() {
+    currentYear = parseInt(document.getElementById("yearSelector").value, 10);
+    localStorage.setItem("selectedYear", currentYear); // Store year
+    generateCalendar(currentMonth, currentYear);
+}
 
-    prevMonthBtn.addEventListener("click", function () {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        updateCalendar();
-    });
+function jumpToToday() {
+    const today = new Date();
+    window.currentMonth = today.getMonth();
+    window.currentYear = today.getFullYear();
+    generateCalendar(window.currentMonth, window.currentYear);
+}
 
-    nextMonthBtn.addEventListener("click", function () {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        updateCalendar();
-    });
+// 🛠 Ensure loadCalendarState() is defined BEFORE generateCalendar()
+function loadCalendarState() {
+    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
+    const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
+    const dayDivs = document.querySelectorAll('#calendar .day');
 
-    todayBtn.addEventListener("click", function () {
-        currentDate = new Date();
-        updateCalendar();
-    });
+    dayDivs.forEach(div => {
+        const day = div.innerText;
+        if (!day) return;
 
-    monthSelector.addEventListener("click", function (event) {
-        if (event.target.tagName === "BUTTON") {
-            currentDate.setMonth(parseInt(event.target.dataset.month));
-            updateCalendar();
+        if (storedData.workDays.some(d => d.day == day)) {
+            div.classList.add('work');
+        }
+
+        if (storedData.checkedDays.some(d => d.day == day)) {
+            div.classList.add('checked');
+            div.querySelector('.checkbox').checked = true;
         }
     });
 
-    yearSelector.addEventListener("change", function () {
-        currentDate.setFullYear(parseInt(yearSelector.value));
-        updateCalendar();
-    });
-
-    updateCalendar();
-});
-
-// 🎉 Confetti Effect
-function confettiEffect() {
-    for (let i = 0; i < 100; i++) {
-        let confetti = document.createElement("div");
-        confetti.classList.add("confetti");
-        document.body.appendChild(confetti);
-
-        confetti.style.left = Math.random() * window.innerWidth + "px";
-        confetti.style.top = Math.random() * window.innerHeight + "px";
-        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-
-        setTimeout(() => confetti.remove(), 2000);
-    }
+    updateShiftCountdown();
 }
 
-// Trigger Confetti When a Workday is Checked
-document.addEventListener("change", function (event) {
-    if (event.target.classList.contains("checkbox") && event.target.checked) {
-        confettiEffect();
+
+function generateCalendar(month, year) {
+    const calendarContainer = document.getElementById('calendar');
+    const monthYearDisplay = document.getElementById('monthYear');
+    const today = new Date();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    // ✅ Reset calendar display
+    calendarContainer.innerHTML = '';
+    monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
+
+    // ✅ Generate Empty Spaces for Alignment
+    for (let i = 0; i < firstDay; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.classList.add('empty');
+        calendarContainer.appendChild(emptyDiv);
     }
-});
+
+    // ✅ Generate Calendar Days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('day');
+        dayDiv.innerText = day;
+
+        // ✅ Highlight Today
+        if (month === today.getMonth() && year === today.getFullYear() && day === today.getDate()) {
+            dayDiv.classList.add('highlight');
+        }
+
+        // ✅ Checkbox for Workdays
+        const checkBoxElement = document.createElement('input');
+        checkBoxElement.type = 'checkbox';
+        checkBoxElement.classList.add('checkbox');
+        checkBoxElement.onclick = function (event) {
+            event.stopPropagation();
+            dayDiv.classList.toggle('checked');
+            saveCalendarState();
+            updateShiftCountdown();
+        };
+        dayDiv.appendChild(checkBoxElement);
+
+        // ✅ Handle Workday Selection
+        dayDiv.onclick = function () {
+            toggleWorkday(dayDiv, day);
+        };
+
+        calendarContainer.appendChild(dayDiv);
+    }
+
+    // ✅ Load Saved Data
+    loadCalendarState();
+}
+
+
+
+function toggleWorkday(dayDiv, day) {
+    dayDiv.classList.toggle('work');
+    saveCalendarState();
+    updateShiftCountdown();
+}
+
+function prevMonth() {
+    window.currentMonth--;
+    if (window.currentMonth < 0) {
+        window.currentMonth = 11;
+        window.currentYear--;
+    }
+    generateCalendar(window.currentMonth, window.currentYear);
+    saveLastViewedDate();
+}
+
+function nextMonth() {
+    window.currentMonth++;
+    if (window.currentMonth > 11) {
+        window.currentMonth = 0;
+        window.currentYear++;
+    }
+    generateCalendar(window.currentMonth, window.currentYear);
+    saveLastViewedDate();
+}
+
+function saveLastViewedDate() {
+    localStorage.setItem('lastViewedDate', JSON.stringify({ month: window.currentMonth, year: window.currentYear }));
+}
+
+function saveCalendarState() {
+    const workDays = [];
+    const checkedDays = [];
+
+    document.querySelectorAll('#calendar .day.work').forEach(div => {
+        const dayInfo = { day: div.innerText, month: window.currentMonth, year: window.currentYear };
+        workDays.push(dayInfo);
+        if (div.classList.contains('checked')) {
+            checkedDays.push(dayInfo);
+        }
+    });
+
+    const key = `calendar_${window.currentMonth}_${window.currentYear}`;
+    localStorage.setItem(key, JSON.stringify({ workDays, checkedDays }));
+
+    updateShiftCountdown();
+}
+
+function updateShiftCountdown() {
+    let totalWorkDays = 0;
+    let totalCheckedDays = 0;
+
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+
+        if (key.startsWith('calendar_')) {
+            const storedData = JSON.parse(localStorage.getItem(key)) || { workDays: [], checkedDays: [] };
+            totalWorkDays += storedData.workDays.length;
+            totalCheckedDays += storedData.checkedDays.length;
+        }
+    }
+
+    const shiftsLeft = totalWorkDays - totalCheckedDays;
+    document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
+}
+
+// Load stored month and year on page load
+window.onload = function () {
+    const savedMonth = localStorage.getItem("selectedMonth");
+    const savedYear = localStorage.getItem("selectedYear");
+
+    if (savedMonth !== null && savedYear !== null) {
+        currentMonth = parseInt(savedMonth, 10);
+        currentYear = parseInt(savedYear, 10);
+    }
+
+    generateCalendar(currentMonth, currentYear);
+};
