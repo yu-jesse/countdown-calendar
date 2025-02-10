@@ -111,11 +111,11 @@ body {
 
 /* Ensure Buttons Stay in Position */
 .header button:first-child {
-    margin-right: 40px;
+    margin-right: auto;
 }
 
 .header button:last-child {
-    margin-left: 40px;
+    margin-left: auto;
 }
 
 /* Fix Month-Year Label */
