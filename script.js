@@ -98,11 +98,6 @@ function generateCalendar(month, year) {
     calendarContainer.innerHTML = '';
     monthYearDisplay.innerText = `${monthNames[month]} ${year}`;
 
-    dayDiv.onclick = function () {
-        toggleWorkday(dayDiv, day);
-        openEventModal(dayDiv);
-    };
-
     // ✅ Generate Empty Spaces for Alignment
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement('div');
@@ -227,39 +222,6 @@ function createSidebar() {
 
     console.log("Sidebar buttons created:", monthButtons.innerHTML); // ✅ Debugging
 }
-
-let selectedDayDiv = null;
-
-function openEventModal(dayDiv) {
-    selectedDayDiv = dayDiv;
-    document.getElementById('eventModal').style.display = 'block';
-}
-
-function closeEventModal() {
-    document.getElementById('eventModal').style.display = 'none';
-    selectedDayDiv = null;
-}
-
-function saveEvent() {
-    const title = document.getElementById('eventTitle').value;
-    const description = document.getElementById('eventDescription').value;
-
-    if (selectedDayDiv) {
-        selectedDayDiv.dataset.title = title;
-        selectedDayDiv.dataset.description = description;
-        selectedDayDiv.classList.add('has-event');
-    }
-
-    closeEventModal();
-}
-
-document.getElementById('saveEventButton').onclick = saveEvent;
-document.querySelector('.close').onclick = closeEventModal;
-window.onclick = function(event) {
-    if (event.target == document.getElementById('eventModal')) {
-        closeEventModal();
-    }
-};
 
 window.onload = function () {
     createSidebar(); // ✅ Make sure sidebar buttons are created
