@@ -8,33 +8,6 @@ body {
     overflow: auto;
 }
 
-/* Dark Mode */
-body.dark-mode {
-    background-color: #1e1e1e;
-    color: white;
-}
-
-/* Dark Mode Calendar */
-body.dark-mode #calendar {
-    background: #2e2e2e;
-    color: white;
-}
-
-/* Dark Mode Sidebar */
-body.dark-mode .sidebar {
-    background: #111;
-}
-
-/* Dark Mode Buttons */
-body.dark-mode button {
-    background: #555;
-    color: white;
-}
-
-body.dark-mode button:hover {
-    background: #777;
-}
-
 /* Sidebar Styles */
 .sidebar {
     position: fixed;
@@ -227,62 +200,10 @@ body.dark-mode button:hover {
     text-decoration: line-through;
 }
 
+/* Shift Countdown Display */
 #shiftCountdown {
-    font-size: 2em;
-    font-weight: bold;
-    color: #222;
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    text-align: center;
     margin-top: 20px;
-    width: 80%;
-    max-width: 400px;
+    font-size: 1.2em;
 }
 
-
-.confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    animation: fall 1s ease-out forwards;
-}
-
-@keyframes fall {
-    0% { transform: translateY(-100vh); }
-    100% { transform: translateY(100vh); }
-}
-
-
-/* 📱 Mobile Compatibility */
-@media screen and (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 10px;
-    }
-
-    .container {
-        margin-left: 0;
-        width: 100%;
-        padding: 10px;
-    }
-
-    #calendar {
-        grid-template-columns: repeat(7, 1fr); /* Keep 7 columns */
-        gap: 3px;
-    }
-
-    .day {
-        padding: 15px;
-        font-size: 14px;
-    }
-
-    #shiftCountdown {
-        font-size: 1.5em; /* Make it more prominent on mobile */
-        text-align: center;
-    }
-}
+/* ✅ Removed Weekday Labels */

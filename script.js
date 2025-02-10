@@ -4,27 +4,6 @@ if (typeof window.currentMonth === 'undefined') {
     window.currentYear = new Date().getFullYear();
 }
 
-const themeToggle = document.getElementById("themeToggle");
-const body = document.body;
-
-// Check saved theme preference
-const savedTheme = localStorage.getItem("theme");
-if (savedTheme) {
-    body.classList.add(savedTheme);
-}
-
-// Toggle between light and dark mode
-themeToggle.addEventListener("click", () => {
-    if (body.classList.contains("dark-mode")) {
-        body.classList.remove("dark-mode");
-        localStorage.setItem("theme", "");
-    } else {
-        body.classList.add("dark-mode");
-        localStorage.setItem("theme", "dark-mode");
-    }
-});
-
-
 function initializeCalendar() {
     createSidebar();
     const savedDate = JSON.parse(localStorage.getItem('lastViewedDate'));
@@ -163,6 +142,7 @@ function generateCalendar(month, year) {
 }
 
 
+
 function toggleWorkday(dayDiv, day) {
     dayDiv.classList.toggle('work');
     saveCalendarState();
@@ -228,30 +208,6 @@ function updateShiftCountdown() {
     const shiftsLeft = totalWorkDays - totalCheckedDays;
     document.getElementById('shiftCountdown').innerText = `Shifts left: ${shiftsLeft}`;
 }
-
-function confettiEffect() {
-    const confettiCount = 100;
-    for (let i = 0; i < confettiCount; i++) {
-        let confetti = document.createElement("div");
-        confetti.classList.add("confetti");
-        document.body.appendChild(confetti);
-
-        confetti.style.left = Math.random() * window.innerWidth + "px";
-        confetti.style.top = Math.random() * window.innerHeight + "px";
-        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-
-        setTimeout(() => {
-            confetti.remove();
-        }, 2000);
-    }
-}
-
-// Add confetti when checking off a workday
-document.addEventListener("change", function (event) {
-    if (event.target.classList.contains("checkbox") && event.target.checked) {
-        confettiEffect();
-    }
-});
 
 // Load stored month and year on page load
 window.onload = function () {
